@@ -25,8 +25,4 @@ public class Education {
 
     @Column(nullable = false)
     private Float marks;
-
-    @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
 }

@@ -5,8 +5,8 @@ import com.example.portfolio.repository.ProjectsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Optional;
+import java.util.List;
 
 @Service
 public class ProjectService {
@@ -18,11 +18,11 @@ public class ProjectService {
         this.projectsRepository = projectsRepository;
     }
 
-    public List<Projects> getProjectsByUserId(Long userId) {
-        return projectsRepository.findByUserId(userId);
-    }
-
     public Optional<Projects> getProjectByProjectId(Long projectId) {
         return projectsRepository.findById(projectId);
+    }
+
+    public List<Projects> findAllProjects() {
+        return projectsRepository.findAll();
     }
 }

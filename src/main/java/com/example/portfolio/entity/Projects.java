@@ -2,7 +2,6 @@ package com.example.portfolio.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
-import java.util.List;
 
 @Entity
 @Table(name = "projects")
@@ -27,10 +26,4 @@ public class Projects {
     @Column(columnDefinition = "TEXT")
     private String repoUrl;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
-
-    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ProjectImage> images; 
 }

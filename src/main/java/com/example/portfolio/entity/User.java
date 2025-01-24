@@ -2,7 +2,6 @@ package com.example.portfolio.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
-import java.util.List;
 
 @Entity
 @Table(name = "users") 
@@ -35,14 +34,5 @@ public class User {
 
     @Column(columnDefinition = "TEXT")
     private String githubUrl;
-
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Education> education;
-
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Projects> projects;
-
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Skills> skills;
 
 }

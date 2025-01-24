@@ -14,8 +14,4 @@ public class ProjectImage {
     @Lob
     @Column(nullable = false)
     private byte[] image; 
-
-    @ManyToOne
-    @JoinColumn(name = "project_id", nullable = false)
-    private Projects project; 
 }
