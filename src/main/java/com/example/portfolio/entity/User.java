@@ -35,4 +35,7 @@ public class User {
     @Column(columnDefinition = "TEXT")
     private String githubUrl;
 
+    public byte[] getProfilePicture() {
+        return profilePicture;
+    }
 }

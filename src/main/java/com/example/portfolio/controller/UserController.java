@@ -10,8 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import java.util.Base64;
 
-
+@CrossOrigin
 @RestController
 @RequestMapping("/user")
 public class UserController {
@@ -49,9 +50,9 @@ public class UserController {
     }
 
     @GetMapping("/{id}/profile")
-    public ResponseEntity<byte[]> getProfilePicture(@PathVariable Long id) {
+    public ResponseEntity<String> getProfilePicture(@PathVariable Long id) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found with ID: " + id));
+            .orElseThrow(() -> new RuntimeException("User not found with ID: " + id));
 
         byte[] profilePicture = user.getProfilePicture();
 
@@ -59,6 +60,8 @@ public class UserController {
             return ResponseEntity.status(404).body(null);
         }
 
-        return ResponseEntity.ok(profilePicture);
+        String base64ProfilePicture = Base64.getEncoder().encodeToString(profilePicture);
+        return ResponseEntity.ok(base64ProfilePicture);
     }
+
 }
