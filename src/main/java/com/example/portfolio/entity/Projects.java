@@ -26,4 +26,7 @@ public class Projects {
     @Column(columnDefinition = "TEXT")
     private String repoUrl;
 
+    @Column(name = "project_image_id")
+    private Long imageId; 
+
 }
