@@ -2,6 +2,8 @@ package com.example.portfolio.entity;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import java.util.UUID;
+
 import lombok.Data;
 
 @Entity
@@ -10,8 +12,9 @@ import lombok.Data;
 public class Contact {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.AUTO) 
+    @Column(columnDefinition = "UUID")
+    private UUID id;
 
     private String name;
 

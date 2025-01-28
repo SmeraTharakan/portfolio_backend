@@ -1,5 +1,7 @@
 package com.example.portfolio.entity;
 
+import java.util.UUID;
+
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -8,8 +10,9 @@ import lombok.Data;
 @Data
 public class Projects {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.AUTO) 
+    @Column(columnDefinition = "UUID")
+    private UUID id;
 
     @Column(nullable = false, length = 150)
     private String title;
@@ -27,6 +30,6 @@ public class Projects {
     private String repoUrl;
 
     @Column(name = "project_image_id")
-    private Long imageId; 
+    private UUID imageId; 
 
 }

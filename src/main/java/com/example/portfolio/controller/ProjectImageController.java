@@ -1,14 +1,16 @@
 package com.example.portfolio.controller;
 
 import com.example.portfolio.entity.ProjectImage;
-import com.example.portfolio.repository.ProjectImageRepository;
+import com.example.portfolio.service.ProjectImageService;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import java.io.IOException;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
-import java.util.Base64;
+import java.util.UUID;
+import java.util.List;
 
 
 @CrossOrigin 
@@ -16,38 +18,53 @@ import java.util.Base64;
 @RequestMapping("/project-images")
 public class ProjectImageController {
 
-    @Autowired
-    private ProjectImageRepository projectImageRepository;
+    private final ProjectImageService projectImageService;
 
-    // Upload project image
+    @Autowired
+    public ProjectImageController(ProjectImageService projectImageService) {
+        this.projectImageService = projectImageService;
+    }
+
     @PostMapping("/upload")
     public ResponseEntity<String> uploadProjectImage(@RequestParam("image") MultipartFile file) {
         try {
-            ProjectImage projectImage = new ProjectImage();
-            projectImage.setImage(file.getBytes());
-
-            projectImageRepository.save(projectImage);
-
-            return ResponseEntity.ok("Project image uploaded successfully!");
+            String message = projectImageService.uploadProjectImage(file);
+            return ResponseEntity.ok(message);
         } catch (IOException e) {
             return ResponseEntity.status(500).body("Failed to upload image: " + e.getMessage());
+        }catch (RuntimeException e) {
+            return ResponseEntity.status(404).body(e.getMessage());
         }
     }
 
-    // Get project image by ID
     @GetMapping("/{id}")
-    public ResponseEntity<String> getProjectImage(@PathVariable Long id) {
-        ProjectImage projectImage = projectImageRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("Project image not found with ID: " + id));
-
-        byte[] imageBytes = projectImage.getImage();
-
-        if (imageBytes == null) {
-            return ResponseEntity.status(404).body(null);
+    public ResponseEntity<String> getProjectImage(@PathVariable UUID id) {
+        try {
+            String base64Image = projectImageService.getProjectImage(id);
+            return ResponseEntity.ok(base64Image);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(404).body(e.getMessage());
         }
+    }
 
-        String base64Image = Base64.getEncoder().encodeToString(imageBytes);
-        return ResponseEntity.ok(base64Image);
+    @GetMapping
+    public ResponseEntity<List<ProjectImage>> getAllProjectImages() {
+        List<ProjectImage> projectImages = projectImageService.getAllProjectImages();
+        if (projectImages.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(projectImages);
+    }
+
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteProjectImage(@PathVariable UUID id) {
+        try {
+            String message = projectImageService.deleteProjectImage(id);
+            return ResponseEntity.ok(message);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(404).body(e.getMessage());
+        }
     }
 }
 

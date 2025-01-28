@@ -2,7 +2,6 @@ package com.example.portfolio.controller;
 
 import com.example.portfolio.entity.User;
 import com.example.portfolio.service.UserService;
-import com.example.portfolio.repository.UserRepository;
 
 import java.io.IOException;
 
@@ -10,7 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import java.util.Base64;
+import java.util.List;
+import java.util.UUID;
 
 @CrossOrigin
 @RestController
@@ -18,30 +18,44 @@ import java.util.Base64;
 public class UserController {
 
     private final UserService userService;
-    private final UserRepository userRepository;
 
     @Autowired
-    public UserController(UserService userService,UserRepository userRepository) {
+    public UserController(UserService userService) {
         this.userService = userService;
-        this.userRepository = userRepository;
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<User> getUserById(@PathVariable Long id) {
+    public ResponseEntity<User> getUserById(@PathVariable UUID id) {
         User user = userService.getUserById(id);
         return ResponseEntity.ok(user);
     }
     
+    @GetMapping
+    public List<User> getAllUsers() {
+        return userService.getAllUsers();
+    }
+
+
+    @PostMapping
+    public User createUser(@RequestBody User user) {
+        return userService.createUser(user);
+    }
+
+    @PutMapping("/{id}")
+    public User updateUser(@PathVariable UUID id, @RequestBody User userDetails) {
+        return userService.updateUser(id, userDetails);
+    }
+
+    @DeleteMapping("/{id}")
+    public void deleteUser(@PathVariable UUID id) {
+        userService.deleteUser(id);
+    }
+
     @PostMapping("/{id}/upload-profile")
-    public ResponseEntity<String> uploadProfilePicture(@PathVariable Long id, @RequestParam("image") MultipartFile file) {
+    public ResponseEntity<String> uploadProfilePicture(@PathVariable UUID id, @RequestParam("image") MultipartFile file) {
         try {
-            User user = userService.getUserById(id);
-
-            user.setProfilePicture(file.getBytes());
-
-            userRepository.save(user);
-
-            return ResponseEntity.ok("Profile picture uploaded successfully!");
+            String message = userService.uploadProfilePicture(id, file);
+            return ResponseEntity.ok(message);
         } catch (IOException e) {
             return ResponseEntity.status(500).body("Failed to upload image: " + e.getMessage());
         } catch (RuntimeException e) {
@@ -50,18 +64,23 @@ public class UserController {
     }
 
     @GetMapping("/{id}/profile")
-    public ResponseEntity<String> getProfilePicture(@PathVariable Long id) {
-        User user = userRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("User not found with ID: " + id));
-
-        byte[] profilePicture = user.getProfilePicture();
-
-        if (profilePicture == null) {
-            return ResponseEntity.status(404).body(null);
+    public ResponseEntity<String> getProfilePicture(@PathVariable UUID id) {
+        try {
+            String base64ProfilePicture = userService.getProfilePicture(id);
+            return ResponseEntity.ok(base64ProfilePicture);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(404).body(e.getMessage());
         }
+    }
 
-        String base64ProfilePicture = Base64.getEncoder().encodeToString(profilePicture);
-        return ResponseEntity.ok(base64ProfilePicture);
+    @DeleteMapping("/{id}/profile")
+    public ResponseEntity<String> deleteProfilePicture(@PathVariable UUID id) {
+        try {
+            String message = userService.deleteProfilePicture(id);
+            return ResponseEntity.ok(message);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(404).body(e.getMessage());
+        }
     }
 
 }
